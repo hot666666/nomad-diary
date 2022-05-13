@@ -1,21 +1,36 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import Navigator from "./navigator";
+import AppLoading from "expo-app-loading";
+import { ContextDB } from "./context";
+import * as SQLite from "expo-sqlite";
+import { initializeTable } from "./sqlite";
 
 export default function App() {
+  const [loading, setLoading] = useState(true);
+  const [db, setDB] = useState(null);
+
+  const startLoading = async () => {
+    const connection = await SQLite.openDatabase("db.db");
+    initializeTable(connection);
+    setDB(connection);
+  };
+  const onFinish = () => setLoading(false);
+
+  if (loading) {
+    return (
+      <AppLoading
+        onError={console.error}
+        startAsync={startLoading}
+        onFinish={onFinish}
+      />
+    );
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <ContextDB.Provider value={db}>
+      <NavigationContainer>
+        <Navigator />
+      </NavigationContainer>
+    </ContextDB.Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
