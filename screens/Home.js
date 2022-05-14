@@ -15,7 +15,6 @@ if (Platform.OS === "android") {
 const Home = ({ navigation, route: { params } }) => {
   const db = useDB();
   const [feelings, setFeelings] = useState([]);
-  const [forceUpdate, forceUpdateId] = useForceUpdate();
 
   const loadDiary = async () => {
     await db.transaction(async (tx) => {
@@ -34,13 +33,9 @@ const Home = ({ navigation, route: { params } }) => {
   };
 
   const deleteFeeling = (id) => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql(`delete from DIARY where id = ?;`, [id]);
-      },
-      null,
-      forceUpdate
-    );
+    db.transaction((tx) => {
+      tx.executeSql(`delete from DIARY where id = ?;`, [id]);
+    }, null);
     loadDiary();
   };
 
@@ -64,6 +59,7 @@ const Home = ({ navigation, route: { params } }) => {
         renderItem={({ item }) => (
           <Record
             onPress={() => {
+              console.log(item.id);
               deleteFeeling(item.id);
             }}
           >
@@ -77,11 +73,6 @@ const Home = ({ navigation, route: { params } }) => {
       </Btn>
     </View>
   );
-};
-
-const useForceUpdate = () => {
-  const [value, setValue] = useState(0);
-  return [() => setValue(value + 1), value];
 };
 
 export default Home;
