@@ -64,7 +64,6 @@ const Home = ({ navigation, route: { params } }) => {
         renderItem={({ item }) => (
           <Record
             onPress={() => {
-              console.log(item.id);
               deleteFeeling(item.id);
             }}
           >
